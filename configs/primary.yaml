@@ -1,0 +1,55 @@
+# Experiment 1: BD-EAGLE primary run (warm start from EAGLE-3)
+
+run_name: bd_eagle_primary
+
+# Models
+# AngelSlim/Qwen3-8B_eagle3 was trained with Qwen/Qwen3-8B (base, not instruct)
+target_model: Qwen/Qwen3-8B
+eagle_model: AngelSlim/Qwen3-8B_eagle3
+dflash_model: z-lab/Qwen3-8B-DFlash-b16
+bd_eagle_checkpoint: checkpoints/bd_eagle_primary/step_011500
+
+# Hidden-state indices for feature extraction (HuggingFace output_hidden_states format).
+# Index 0 = embedding output; index k = output of transformer layer k-1.
+# EAGLE-3 extracts before layers 2, 18, 33 of the 36-layer Qwen3-8B,
+# i.e. the hidden state BEFORE those layers (= output of layers 1, 17, 32).
+# In HF format: hidden_states[2], hidden_states[18], hidden_states[33].
+target_layer_indices: [2, 18, 33]
+
+# Feature cache
+feature_cache_dir: data/feature_cache_qwen3_8b
+
+# Dataset
+max_samples: 30000
+max_length: 512
+
+# WSD schedule
+warmup_sizes: [1, 2, 4, 8]
+stable_size: 8
+decay_sizes: [4, 2]
+steps_per_warmup_size: 500
+stable_steps: 8000
+steps_per_decay_size: 500
+
+# LR
+lr_max: 3.0e-4
+lr_min: 3.0e-5
+
+# Training
+batch_size: 8
+num_workers: 4
+grad_clip: 0.5
+
+# Loss options (primary: uniform masking, no position weight)
+use_anchor_masking: false
+n_anchors_per_block: 0
+use_position_weight: false
+loss_gamma: 5.0
+
+# Logging
+log_every: 50
+save_every: 500
+output_dir: checkpoints/bd_eagle_primary
+
+# Inference
+inference_block_size: 8

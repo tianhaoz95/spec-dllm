@@ -1,0 +1,44 @@
+# Experiment 2: BD-EAGLE cold start (random init, same WSD schedule)
+
+run_name: bd_eagle_cold_start
+
+# Models
+target_model: Qwen/Qwen3-8B
+eagle_model: AngelSlim/Qwen3-8B_eagle3   # loaded for architecture shape only
+dflash_model: z-lab/Qwen3-8B-DFlash-b16
+bd_eagle_checkpoint: checkpoints/bd_eagle_cold_start/step_011500
+
+# Same as primary
+target_layer_indices: [2, 18, 33]
+feature_cache_dir: data/feature_cache_qwen3_8b  # reuse the same cache
+
+max_samples: 30000
+max_length: 512
+
+warmup_sizes: [1, 2, 4, 8]
+stable_size: 8
+decay_sizes: [4, 2]
+steps_per_warmup_size: 500
+stable_steps: 8000
+steps_per_decay_size: 500
+
+lr_max: 3.0e-4
+lr_min: 3.0e-5
+
+batch_size: 8
+num_workers: 4
+grad_clip: 0.5
+
+use_anchor_masking: false
+n_anchors_per_block: 0
+use_position_weight: false
+loss_gamma: 5.0
+
+log_every: 50
+save_every: 500
+output_dir: checkpoints/bd_eagle_cold_start
+
+# Flag for training script: reinitialise drafter weights randomly
+cold_start: true
+
+inference_block_size: 8
